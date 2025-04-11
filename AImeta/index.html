@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna Jewelery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="icons8-jewelry-100.png" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <img src="./uploads/preload.jpg" alt="Luna Jeweler Logo" class="preloader-logo" />
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div id="site-wrapper" class="hidden-body">
+        <header>
+            <div class="navbar">
+                <div class="logo">
+                    <img src="your-jewelry-background.jpg" alt="Luna Jewelery Logo" class="logo-img">
+                    Luna Jewelery
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search jewelry..." autocomplete="off">
+                    <div id="searchResults"></div>
+                </div>
+                <div class="localisation">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Algeria, <strong>Blida</strong></span>
+                </div>
+                <nav class="nav-buttons">
+                    <button class="phone-number">
+                        <a href="tel:+213561317471">+213561317471</a>
+                    </button>
+                    <button class="mail">
+                        <a href="mailto:killerbidk@gmail.com" title="Email Luna Jeweler">killerbidk@gmail.com</a>
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <div class="container" id="jewelryContainer"></div>
+        </main>
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="social">
+                <a href="https://www.instagram.com/luna.jewellery20?igsh=MXdjNTB0cDgwa2cxOA==" taret="_blank"><i
+                        class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-snapchat"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+            </div>
+            <p>© 2025 Luna Jeweler. All rights reserved.</p>
+            <!-- Scroll to Top Button -->
+            <button id="scrollTopBtn" title="Go to top"><i class="fas fa-chevron-up"></i></button>
+        </footer>
+    </div>
+    <script>
+        const logoImg = document.querySelector('.logo-img');
+        let holdTimeout;
+
+        logoImg.addEventListener('mousedown', () => {
+            holdTimeout = setTimeout(() => {
+                window.location.href = 'admin.php';
+            }, 6000); // 6 seconds
+        });
+
+        ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(event => {
+            logoImg.addEventListener(event, () => {
+                clearTimeout(holdTimeout);
+            });
+        });
+    </script>
+    <script>
+        fetch('api.php')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('jewelryContainer');
+                container.innerHTML = '';
+
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = item.card_type || 'card';
+                    card.id = `card-${item.id}`;
+                    card.innerHTML = `
+                <img src="uploads/${item.image}" alt="${item.title}">
+                <h2>${item.title}</h2>
+                <p>${item.description.replace(/\n/g, '<br>')}</p>
+              `;
+                    container.appendChild(card);
+                });
+            });
+    </script>
+    <script>
+        const scrollTopBtn = document.getElementById("scrollTopBtn");
+
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 100) {
+                scrollTopBtn.classList.add("show");
+            } else {
+                scrollTopBtn.classList.remove("show");
+            }
+        });
+
+        scrollTopBtn.addEventListener("click", () => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+    </script>
+    <script>
+        window.addEventListener("load", () => {
+            const preloader = document.getElementById("preloader");
+            preloader.classList.add("slide-left");
+            setTimeout(() => {
+                preloader.style.display = "none";
+            }, 3000); // Match animation duration
+        });
+    </script>
+    <script>
+        window.addEventListener("load", () => {
+            const preloader = document.getElementById("preloader");
+            const siteWrapper = document.getElementById("site-wrapper");
+
+            preloader.classList.add("slide-left");
+
+            setTimeout(() => {
+                preloader.style.display = "none";
+                siteWrapper.classList.remove("hidden-body");
+                siteWrapper.classList.add("fade-in-body");
+            }, 3000);
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.card, .card2').forEach(card => {
+            let timeout;
+            const img = card.querySelector('img');
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            card.addEventListener('mouseenter', () => {
+                timeout = setTimeout(() => {
+                    card.classList.add('zoomed');
+                    img.style.cursor = 'grab';
+                }, 2000);
+            });
+
+            card.addEventListener('mouseleave', () => {
+                clearTimeout(timeout);
+                card.classList.remove('zoomed');
+                img.style.transform = 'scale(1)';
+                img.style.left = '0px';
+                img.style.top = '0px';
+                img.style.cursor = 'default';
+                offsetX = 0;
+                offsetY = 0;
+            });
+
+            img.addEventListener('mousedown', (e) => {
+                if (!card.classList.contains('zoomed')) return;
+                isDragging = true;
+                img.style.cursor = 'grabbing';
+                startX = e.clientX - offsetX;
+                startY = e.clientY - offsetY;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging || !card.classList.contains('zoomed')) return;
+
+                const cardRect = card.getBoundingClientRect();
+                const imgRect = img.getBoundingClientRect();
+                const scale = 1.8;
+
+                offsetX = e.clientX - startX;
+                offsetY = e.clientY - startY;
+
+                // Clamp movement to the bounds of the card
+                const maxOffsetX = (img.width * (scale - 1)) / 2;
+                const maxOffsetY = (img.height * (scale - 1)) / 2;
+
+                offsetX = Math.max(-maxOffsetX, Math.min(offsetX, maxOffsetX));
+                offsetY = Math.max(-maxOffsetY, Math.min(offsetY, maxOffsetY));
+
+                img.style.left = `${offsetX}px`;
+                img.style.top = `${offsetY}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    if (card.classList.contains('zoomed')) {
+                        img.style.cursor = 'grab';
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const query = this.value.trim();
+            const resultsBox = document.getElementById('searchResults');
+
+            if (query.length === 0) {
+                resultsBox.innerHTML = '';
+                resultsBox.style.display = 'none';
+                return;
+            }
+
+            fetch('search.php?q=' + encodeURIComponent(query))
+                .then(res => res.json())
+                .then(data => {
+                    resultsBox.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.classList.add('search-result-card');
+                            div.innerHTML = `
+                        <img src="uploads/${item.image}" alt="${item.title}">
+                        <div class="info">
+                            <strong>${item.title}</strong>
+                            <p>${item.description}</p>
+                        </div>
+                    `;
+                            div.addEventListener('click', () => {
+                                const el = document.getElementById(`card-${item.id}`);
+                                if (el) {
+                                    setTimeout(() => {
+                                        el.scrollIntoView({
+                                            behavior: 'smooth',
+                                            block: 'center'
+                                        });
+                                        el.classList.add('highlight');
+                                        setTimeout(() => el.classList.remove(
+                                            'highlight'), 1500);
+                                    }, 100);
+                                }
+                                resultsBox.innerHTML = '';
+                                resultsBox.style.display = 'none';
+                                document.getElementById('searchInput').value = '';
+                            });
+                            resultsBox.appendChild(div);
+                        });
+                        resultsBox.style.display = 'block';
+                    } else {
+                        resultsBox.innerHTML = '<div class="no-match">No match found</div>';
+                        resultsBox.style.display = 'block';
+                    }
+                });
+        });
+    </script>
+</body>
+
+</html>
