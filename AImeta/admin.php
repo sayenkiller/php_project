@@ -1,17 +1,4 @@
-<?php
-session_start();
-require 'DB.php';
-// Check if the user is logged in
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: login.php");
-    exit;
-}
 
-// Check if the welcome popup has been shown before
-if (!isset($_SESSION['welcome_popup_shown'])) {
-    $_SESSION['welcome_popup_shown'] = false;
-}
-?>
 
 <!DOCTYPE html>
 <html lang="en">
